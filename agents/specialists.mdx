@@ -1,0 +1,238 @@
+---
+title: "Specialist Coding Agents by Language and Framework"
+sidebarTitle: "Specialists"
+description: "Eight domain-specific subagents covering web, C#, Rust, FiveM, Discord, Unity, Godot, and OpenCode config — each loaded by the orchestrator or called directly."
+---
+
+Specialist agents are subagents that carry deep, focused knowledge of a single language or framework stack. The orchestrator selects and calls them automatically based on your project's technology, but you can also invoke any specialist directly by name when you already know which domain you're working in. Each specialist inspects your project before making changes, follows your existing conventions, and runs the relevant build or test checks after implementation.
+
+---
+
+<Accordion title="Web Development — webdev">
+
+**Handles:** React, Next.js, Vue 3, TypeScript, JavaScript, HTML, CSS, Tailwind CSS, Vite, Node.js, Express, REST APIs, WebSockets, MongoDB, PostgreSQL, and Prisma.
+
+The `webdev` agent is a senior full-stack web developer. It covers the entire web stack — from React Server Components and Vue 3 Composition API on the frontend to Express REST APIs and Prisma database access on the backend. Before touching your code, it reads `package.json`, identifies your framework and version, and inspects your existing component architecture, styling system, and configuration files (`vite.config.*`, `next.config.*`).
+
+**Key capabilities:**
+
+- React (App Router, Server Components, Client Components, hooks)
+- Next.js (SSR, SSG, App Router, API routes)
+- Vue 3 (Composition API, `<script setup>`, Pinia, Vue Router)
+- TypeScript type safety across the full stack
+- Tailwind CSS and responsive, accessible layouts
+- Vite configuration, plugins, aliases, and build setup
+- Node.js / Express backend, authentication, API validation
+- MongoDB, PostgreSQL, and Prisma ORM
+- WebSockets for real-time features
+- Greenfield projects with Better-T-Stack for end-to-end type safety
+
+**Skills it can load:** `frontend-design`, `design-taste-frontend`, `redesign-existing-projects`, `impeccable`, `emil-design-eng`, `animate`, `pick-ui-library`, `image-to-code`, `apple-design`, `deslop`
+
+**Example prompt:**
+```text
+Add a search page to my Next.js app that fetches results from the /api/search
+endpoint, shows a loading skeleton, and handles empty-state gracefully
+```
+
+</Accordion>
+
+<Accordion title="C# / .NET — csharp">
+
+**Handles:** C#, .NET, ASP.NET, Unity C#, LINQ, async/await, Tasks, multithreading, NuGet, REST APIs, JSON, Entity Framework, debugging, architecture, and performance.
+
+The `csharp` agent is a senior C# and .NET developer. It reads your `.csproj` files and understands your existing abstractions before making any changes. It keeps implementation focused, preserves public APIs, handles errors appropriately, and runs `dotnet build` plus your relevant tests after every change.
+
+**Key capabilities:**
+
+- ASP.NET Core REST API controllers and middleware
+- Entity Framework Core (migrations, queries, relationships)
+- async/await and Task-based concurrency patterns
+- LINQ queries — readable and performant
+- NuGet package management and dependency evaluation
+- JSON serialization with `System.Text.Json` / `Newtonsoft.Json`
+- Multithreading and thread-safe data structures
+- C# debugging and performance profiling guidance
+- Unity C# scripts (non-Unity-editor tasks; full Unity work goes to `unity`)
+
+**Skills it can load:** `deslop`
+
+**Example prompt:**
+```text
+Add an endpoint to my ASP.NET Core API that accepts a paginated GET request
+for /api/products and returns results from the database using Entity Framework
+```
+
+</Accordion>
+
+<Accordion title="Rust — rust">
+
+**Handles:** Rust, Cargo, Tokio, async Rust, ownership, borrowing, lifetimes, traits, generics, macros, error handling, WASM, FFI, networking, concurrency, performance, and debugging.
+
+The `rust` agent is a senior Rust developer. It starts every task by reading `Cargo.toml` and inspecting the workspace structure and crate boundaries before touching code. It writes idiomatic Rust — no unnecessary cloning, no unnecessary allocations, minimal `unsafe`, and no fighting the borrow checker with workarounds. After implementation it runs `cargo check`, `cargo test`, and `cargo clippy`.
+
+**Key capabilities:**
+
+- Async Rust with Tokio (tasks, channels, `select!`, timeouts)
+- Ownership, borrowing, and lifetime annotations
+- Trait design and generic programming
+- Procedural and declarative macros
+- Error handling with `thiserror` / `anyhow`
+- WebAssembly (WASM) compilation and interop
+- Foreign Function Interface (FFI) with C libraries
+- Networking with `hyper`, `axum`, or `reqwest`
+- Performance profiling and allocation reduction
+- Cargo workspace management and dependency evaluation
+
+**Skills it can load:** `deslop`
+
+**Example prompt:**
+```text
+Add a rate-limited HTTP client using Tokio and reqwest that retries on 429
+responses with exponential back-off
+```
+
+</Accordion>
+
+<Accordion title="FiveM — fivem">
+
+**Handles:** FiveM Lua resources, client scripts, server scripts, fxmanifest.lua, NUI, ESX, QBCore, ox_lib, events, callbacks, networking, player state, resource communication, database integration, performance, and debugging.
+
+The `fivem` agent is a senior FiveM developer. It reads `fxmanifest.lua` first, identifies the framework (ESX, QBCore, or standalone), and checks existing events and exports before writing anything. It keeps client and server responsibilities strictly separated, validates all network events server-side, and never trusts client-provided values.
+
+**Key capabilities:**
+
+- Client and server Lua scripting following framework conventions
+- `fxmanifest.lua` configuration (dependencies, exports, NUI pages)
+- ESX and QBCore integration (items, jobs, inventories, notifications)
+- ox_lib components (context menus, inputs, callbacks, target)
+- NUI (HTML/CSS/JS) panels and client-side communication
+- Triggered events, registered callbacks, and exported functions
+- Database integration (oxmysql / ghmattimysql)
+- Player state management and persistence
+- Network event validation and anti-cheat awareness
+- Resource performance profiling
+
+**Skills it can load:** `deslop`
+
+**Example prompt:**
+```text
+Create a QBCore job script with a client-side NUI panel that shows the player's
+current duty status and lets them toggle it on/off
+```
+
+</Accordion>
+
+<Accordion title="Discord — discord">
+
+**Handles:** Discord bots, slash commands, Gateway events, intents, permissions, interactions, and Discord bots deployed to Cloudflare Workers.
+
+The `discord` agent is a Discord bot specialist. It always loads the `discord-bot` skill and verifies current Discord Developer Portal steps with web research before giving portal instructions — it never guesses at changing OAuth flows or portal UI. It validates untrusted interaction payloads, verifies request signatures, protects tokens, and uses the least permissions and intents needed.
+
+**Key capabilities:**
+
+- Slash command and context menu registration
+- Gateway intents and event handling
+- Component interactions (buttons, select menus, modals)
+- Cloudflare Workers deployment (Interactions Endpoint and/or Gateway)
+- OAuth2 flow setup and bot permission scopes
+- Webhook handling and signature verification
+- Role and permission management
+- Embed construction and message formatting
+- Rate limit awareness
+
+**Skills it can load:** `discord-bot`, `deslop`
+
+**Example prompt:**
+```text
+Add a /ban slash command to my Discord bot that logs the action to a
+mod-log channel and sends the banned user a DM with the reason
+```
+
+</Accordion>
+
+<Accordion title="Unity — unity">
+
+**Handles:** Unity C#, GameObjects, Components, Scenes, Prefabs, ScriptableObjects, Unity packages, Unity Editor tools, Unity MCP, DOTS/ECS/Jobs/Burst, cross-platform builds, and Unity CLI workflows.
+
+The `unity` agent is a senior Unity developer. It inspects your Unity version, packages, render pipeline, target platforms, assembly definitions, and existing architecture before making changes. It prefers the smallest maintainable solution and profiles before claiming any performance improvement.
+
+**Key capabilities:**
+
+- MonoBehaviour lifecycle and event functions
+- ScriptableObjects for data and configuration
+- Prefabs and nested Prefab workflows
+- Unity Input System (new and legacy)
+- Physics (Rigidbody, CharacterController, raycasts)
+- Rendering pipelines (Built-in, URP, HDRP)
+- DOTS / ECS entity-component patterns and ISystem
+- Unity Jobs System and Burst Compiler for CPU-bound work
+- Unity Editor scripting and custom inspector tools
+- Unity MCP integration
+- Unity CLI for module management, licensing, and CI builds
+
+**Skills it can load:** `unity-developer` (always), `unity-ecs-patterns` (DOTS/Jobs/Burst work), `unity-cli-helper` (CLI/Editor/CI commands), `deslop`
+
+**Example prompt:**
+```text
+Implement an object-pool system for my Unity project that recycles bullet
+GameObjects at runtime and is compatible with the existing shooting controller
+```
+
+</Accordion>
+
+<Accordion title="Godot — godot">
+
+**Handles:** Godot 4.x (targeting 4.7), GDScript 2.0, Godot C#, scene and node composition, UI (Control nodes), physics, 2D/3D movement, animation, audio, shaders, tilemaps, resources, multiplayer/networking, export presets, and headless CLI builds.
+
+The `godot` agent is a senior Godot 4 developer. It starts every task by reading `project.godot` to check the engine version, main scene, autoloads, and input map, then inspects existing scenes and scripts before writing a line of code. It prefers composition of nodes and signals over tight cross-references, uses static typing in GDScript, and keeps network-authoritative logic on the server for multiplayer features.
+
+**Key capabilities:**
+
+- GDScript 2.0 with static typing, `@export`, `@onready`, `@tool`, `await`
+- Porting GDScript 3.x code to 4.x
+- Scene tree structure, packed scenes, `instantiate()`, autoloads
+- Custom signals, Callables, groups
+- CharacterBody2D / CharacterBody3D movement controllers
+- RigidBody, StaticBody, Area, collision layers / masks
+- AnimationPlayer, AnimationTree, and Tween
+- Godot Shading Language (canvas_item and spatial shaders)
+- TileMapLayer, TileSet, and autotiling
+- ENetMultiplayerPeer, `@rpc`, MultiplayerSpawner/Synchronizer
+- Export presets and headless CLI CI builds
+
+**Skills it can load:** `router`, `godot-gdscript`, `godot-nodes-scenes`, `godot-signals-groups`, `godot-physics`, `godot-2d-movement`, `godot-3d-essentials`, `godot-animation`, `godot-audio`, `godot-csharp`, `godot-multiplayer`, `godot-resources`, `godot-shaders`, `godot-tilemap`, `godot-ui-control`, `godot-export`, `deslop`
+
+**Example prompt:**
+```text
+Add a double-jump to my Godot 4 platformer's CharacterBody2D player scene,
+keeping the existing coyote-time and variable jump height logic intact
+```
+
+</Accordion>
+
+<Accordion title="OpenCode Configuration — opencode">
+
+**Handles:** OpenCode agents, skills, permissions, plugins, MCP setup, and workspace configuration files.
+
+The `opencode` agent maintains your OpenCode configuration safely. It always loads the `customize-opencode` skill before modifying any agent, skill, permission, plugin, MCP configuration, or global rules file. It preserves your existing provider, model, and permission choices unless you explicitly ask to change them, and it validates all configuration files after every modification.
+
+**Key capabilities:**
+
+- Adding or editing agent definitions (`.opencode/agents/`)
+- Configuring skill permissions and loading rules
+- Setting up MCP (Model Context Protocol) servers and tools
+- Configuring plugins and workspace-level rules
+- Discovering and installing new skills via `find-skills`
+- Validating `opencode.json` and agent Markdown frontmatter
+- Preserving existing provider and model settings
+
+**Skills it can load:** `customize-opencode` (always), `find-skills` (when discovering new capabilities)
+
+**Example prompt:**
+```text
+Add the code-reviewer agent to my project and configure it so that it
+cannot edit files but can load the deslop skill
+```
+
+</Accordion>

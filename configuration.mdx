@@ -1,0 +1,205 @@
+---
+title: "Configure opencode.json for Your Project"
+sidebarTitle: "Configuration"
+description: "A complete reference for every field in opencode.json — the workspace-level config file that controls agents, permissions, and MCP integrations."
+---
+
+`opencode.json` is the workspace-level configuration file you place in the root of your project. When you run `opencode`, it reads this file to determine which agent handles requests by default, what permissions agents and skills are granted, and which external integrations (MCP servers) are available. Every project that uses the Naimur OpenCode Agents pack needs this file — it is the single source of truth for how opencode behaves in that workspace.
+
+<Tip>
+  Add the `$schema` field to your `opencode.json` to get full autocompletion, inline documentation, and validation in VS Code, JetBrains IDEs, and any other editor that supports JSON Schema. You will see field names, allowed values, and descriptions as you type.
+</Tip>
+
+## Full Configuration Reference
+
+Below is the complete `opencode.json` used by this pack, including the optional MCP block:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrator",
+  "permission": {
+    "skill": {
+      "*": "deny"
+    }
+  },
+  "mcp": {
+    "ziva-godot": {
+      "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe",
+      "args": [
+        "--mcp-bridge",
+        "--godot-bin",
+        "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe",
+        "--upstream",
+        "http://localhost:7012/api/mcp"
+      ],
+      "enabled": true
+    }
+  }
+}
+```
+
+### `$schema`
+
+<ParamField path="$schema" type="string">
+  The URL of the official opencode JSON Schema definition. Set this to `"https://opencode.ai/config.json"` to enable IDE autocompletion and validation. This field does not affect runtime behavior — it is read only by your editor's language server.
+
+  ```json
+  "$schema": "https://opencode.ai/config.json"
+  ```
+</ParamField>
+
+### `default_agent`
+
+<ParamField path="default_agent" type="string" required>
+  The name of the agent that opencode activates when you start a session without specifying an agent. The value must match the filename of an agent Markdown file in your `agents/` directory (without the `.md` extension).
+
+  Setting this to `"orchestrator"` means every request first passes through the orchestrator, which then routes to a specialist as needed. You can change this to any agent name — see [Changing the Default Agent](#changing-the-default-agent) below.
+
+  ```json
+  "default_agent": "orchestrator"
+  ```
+</ParamField>
+
+### `permission`
+
+<ParamField path="permission" type="object">
+  An object that controls what agents and skills are allowed to do at the workspace level. Permissions set here act as the baseline; individual agents can broaden or restrict them within their own Markdown frontmatter.
+
+  ```json
+  "permission": {
+    "skill": {
+      "*": "deny"
+    }
+  }
+  ```
+</ParamField>
+
+#### `permission.skill`
+
+<ParamField path="permission.skill" type="object">
+  A map of skill names to permission values. Each key is a skill name or a wildcard pattern; each value is either `"allow"` or `"deny"`.
+
+  Using `"*": "deny"` as the wildcard rule means **no skill is accessible by default** across the entire workspace. Each individual agent must declare the specific skills it is permitted to load in its own frontmatter. This is the recommended setting — it prevents agents from reaching outside their defined scope and makes the permission model explicit and auditable.
+
+  ```json
+  "permission": {
+    "skill": {
+      "*": "deny"
+    }
+  }
+  ```
+
+  To allow a specific skill globally (for example, if you want every agent to be able to load `customize-opencode`), add it explicitly alongside the wildcard:
+
+  ```json
+  "permission": {
+    "skill": {
+      "*": "deny",
+      "customize-opencode": "allow"
+    }
+  }
+  ```
+</ParamField>
+
+### `mcp`
+
+<ParamField path="mcp" type="object">
+  A map of MCP (Model Context Protocol) server configurations. Each key is a unique name you choose for the server; each value is an object describing how to launch and connect to it. MCP servers extend opencode with external tool integrations — file system access, game engine bridges, database connectors, and more.
+
+  ```json
+  "mcp": {
+    "ziva-godot": {
+      "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe",
+      "args": ["--mcp-bridge", "--godot-bin", "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe", "--upstream", "http://localhost:7012/api/mcp"],
+      "enabled": true
+    }
+  }
+  ```
+</ParamField>
+
+#### MCP Server Fields
+
+Each entry under `mcp` supports the following fields:
+
+<ParamField path="mcp.<name>.command" type="string" required>
+  The absolute path to the MCP server executable. Use a full path to avoid issues with `PATH` resolution across different shells and operating systems.
+
+  ```json
+  "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe"
+  ```
+</ParamField>
+
+<ParamField path="mcp.<name>.args" type="array">
+  An array of command-line arguments passed to the MCP server at startup. Arguments are passed in order and can include flags, file paths, and URLs.
+
+  ```json
+  "args": [
+    "--mcp-bridge",
+    "--godot-bin",
+    "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe",
+    "--upstream",
+    "http://localhost:7012/api/mcp"
+  ]
+  ```
+</ParamField>
+
+<ParamField path="mcp.<name>.enabled" type="boolean">
+  Controls whether opencode starts this MCP server when the workspace loads. Set to `false` to disable a server without removing its configuration — useful when the server binary is not present on a particular machine (for example, in a team repo where only some developers have Godot installed).
+
+  ```json
+  "enabled": true
+  ```
+</ParamField>
+
+---
+
+## Changing the Default Agent
+
+The `default_agent` field lets you optimize opencode for a specific workflow in any project:
+
+**Use `"orchestrator"` (default)** when your project spans multiple languages or frameworks, or when you want automatic specialist routing and built-in code review for every significant change. This is the right choice for most projects.
+
+```json
+"default_agent": "orchestrator"
+```
+
+**Use `"planner"`** when you are in an early design or discovery phase and want to think through an implementation without writing any code yet. The planner agent breaks features into step-by-step implementation plans but holds all edit and bash permissions — it will never modify your files.
+
+```json
+"default_agent": "planner"
+```
+
+**Use `"dev"`** when you have a clear, well-scoped task and want to skip the orchestration layer and go straight to implementation. The dev agent writes and edits code directly, with the `deslop` skill available for cleaning up AI-generated output.
+
+```json
+"default_agent": "dev"
+```
+
+You can also address any agent directly inside an opencode session without changing the config — this setting only controls which agent is active at startup.
+
+---
+
+## MCP Servers
+
+MCP stands for **Model Context Protocol** — an open standard that lets AI agents communicate with external tools and services over a well-defined interface. When an MCP server is configured and enabled, the agents in your workspace can call into it to read or modify state outside the source files (for example, querying a running Godot instance, inspecting a database, or triggering a build system).
+
+The `ziva-godot` entry in the example config above bridges opencode to a live Godot 4 editor session through a local HTTP relay. The `godot` specialist agent uses this connection to inspect scenes, run scripts, and validate changes against the actual engine rather than relying solely on static file analysis.
+
+**To add a new MCP server**, add an entry under the `mcp` key with a descriptive name, set `command` to the path of the server binary, provide any required `args`, and set `enabled` to `true`:
+
+```json
+"mcp": {
+  "my-db-server": {
+    "command": "/usr/local/bin/my-mcp-server",
+    "args": ["--connection-string", "postgresql://localhost/mydb"],
+    "enabled": true
+  }
+}
+```
+
+**To temporarily disable a server** without losing its configuration, set `enabled` to `false`. This is useful in shared repositories where the MCP binary is only available on certain machines.
+
+<Note>
+  MCP server paths are machine-specific. If you commit `opencode.json` to a shared repository, consider using `enabled: false` for servers with hardcoded local paths, or document that each developer should update the `command` path for their own environment.
+</Note>

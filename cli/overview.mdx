@@ -1,0 +1,50 @@
+---
+title: "GitHub Project Docs: Auto-Generate Repository Documentation"
+sidebarTitle: "Overview"
+description: "Generate a structured Markdown document describing every tracked file in a GitHub repository — metadata, file index, languages, sizes, and GitHub links."
+---
+
+The `github-project-docs` CLI tool scans any GitHub repository you have access to and produces a single structured Markdown document that describes every tracked file. You get repository metadata, a searchable file index table, per-file language and size details, conservative purpose notes, and direct GitHub links — all in one place. Feed the output to a code-understanding model, commit it as living documentation, or use it as a fast onboarding reference for a new codebase.
+
+## What It Generates
+
+By default the tool writes the output to `PROJECT_DOCUMENTATION.md` in your current directory. The document is self-contained Markdown that contains the following sections.
+
+**Repository metadata** — the full repository name, description, default branch, the date the document was generated, and the total number of files documented.
+
+**Searchable file index table** — a Markdown table with one row per tracked file. Each row includes:
+
+- **File path** — linked to the file on GitHub at the exact commit or ref you specified
+- **Language** — detected from the file extension (JavaScript, TypeScript, Python, YAML, and many more)
+- **Size** — file size in bytes
+- **Purpose note** — a conservative summary derived from the filename and the file's first meaningful header or comment
+
+**Per-file sections** — after the index table, the document contains one section per file that repeats the language, size, purpose note, and GitHub link in a structured list.
+
+**Optional source excerpts** — when you pass `--include-source`, each per-file section also contains a fenced code block with up to N lines of the file's actual content (80 lines by default, configurable with `--max-source-lines`).
+
+## Requirements
+
+Before running the CLI, make sure you have the following installed and configured:
+
+- **Node.js 18 or later** — the tool uses native ES module syntax and modern Node.js built-ins.
+- **GitHub CLI (`gh`) authenticated** — the tool calls `gh api` internally to fetch repository data. Run `gh auth login` and ensure your token has read access to the target repository.
+
+<Note>
+  Purpose notes are conservative summaries based on filenames, known filename
+  conventions, and the first meaningful line of each file. They are not semantic
+  explanations of what the code does. To get deeper explanations, connect the
+  generated `PROJECT_DOCUMENTATION.md` to a code-understanding model such as
+  an LLM with a large context window.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Usage" icon="terminal" href="/cli/usage">
+    Run the CLI, explore all available flags, and see real-world example
+    commands.
+  </Card>
+  <Card title="Automation" icon="robot" href="/cli/automation">
+    Add the included GitHub Actions workflow to keep your documentation up to
+    date on every push.
+  </Card>
+</CardGroup>

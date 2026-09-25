@@ -1,47 +1,107 @@
 ---
-title: "Quickstart"
-description: "Begin with a guide on the fastest path to a successful outcome"
+title: "Get Started with Naimur OpenCode Agents"
+sidebarTitle: "Quickstart"
+description: "Copy the agent and skill files into your project, add opencode.json, and have the orchestrator routing tasks to specialists in minutes."
 ---
 
-Describe how someone begins using your product. What is the first thing they need to do? Are there any prerequisites?
-
-A quickstart should take someone from zero to using your product. They'll get a quick win and a sense of what they can accomplish.
-
-## Prerequisites
-
-Before you begin, you must have:
-
-- Requirement one (for example, Node.js 18+, a free account, an API key)
-- Requirement two (for example, a compatible device, a compatible browser, a compatible operating system)
-
-## Get started
+This guide gets the orchestrator and all specialist agents working inside your project. By the end, you will be able to open opencode in any of your repositories, describe a task in plain English, and have the right specialist pick it up automatically — with a code-review pass included for substantial changes.
 
 <Steps>
-  <Step title="Install">
-    Describe how to install your product or sign up.
 
-    ```bash
-    npm install your-package
-    ```
-  </Step>
-  <Step title="Configure">
-    Describe any setup or configuration needed before first use.
+### Check the Prerequisites
 
-    ```bash
-    your-cli init
-    ```
-  </Step>
-  <Step title="Run it">
-    Show the first thing a user does to see it working.
+Before you begin, make sure you have the following installed:
 
-    ```bash
-    your-cli start
-    ```
-  </Step>
+- **opencode** — the AI coding platform this pack runs on. Install it by following the [opencode installation guide](https://opencode.ai/docs).
+- **Node.js 18 or later** — required only if you plan to use the `github-project-docs` CLI tool. The agents themselves do not need Node.js.
+- **Git** — to clone the agent pack from GitHub.
+
+Confirm your opencode installation:
+
+```bash
+opencode --version
+```
+
+### Copy the Agent and Skill Files
+
+Clone the repository and copy the `agents/` and `skills/` directories into the root of your project:
+
+```bash
+# Clone the agent pack
+git clone https://github.com/Naiml007/naimur-opencode-agents.git
+
+# Copy agents and skills into your project root
+cp -r naimur-opencode-agents/agents ./agents
+cp -r naimur-opencode-agents/skills ./skills
+```
+
+Your project root should now contain an `agents/` directory with files such as `orchestrator.md`, `webdev.md`, `rust.md`, and a `skills/` directory containing modules like `customize-opencode`, `unity-cli-helper`, and `awesome-design-md`.
+
+<Note>
+  The orchestrator inspects your entire repository before making any architectural decisions — let it read the codebase first when you start a session. The more context it has, the better its routing and implementation choices will be.
+</Note>
+
+### Add opencode.json to Your Project Root
+
+Create an `opencode.json` file in the root of your project with the following content:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "orchestrator",
+  "permission": {
+    "skill": {
+      "*": "deny"
+    }
+  }
+}
+```
+
+Here is what each field does:
+
+| Field | Purpose |
+|---|---|
+| `$schema` | Points to the official opencode config schema so your editor can validate and autocomplete the file. |
+| `default_agent` | Sets `orchestrator` as the agent that handles every request unless you explicitly address a different one. |
+| `permission.skill.*` | The wildcard `"deny"` means no skill is available by default — each agent must explicitly declare which skills it is allowed to load. This prevents agents from using tools outside their defined scope. |
+
+If your project uses a Godot or other MCP-backed integration, see the [Configuration](/configuration) page for how to add an `mcp` block.
+
+### Launch opencode
+
+Open your terminal at the project root and start opencode:
+
+```bash
+opencode
+```
+
+The orchestrator loads automatically because `default_agent` is set to `"orchestrator"` in your `opencode.json`. You should see the opencode interface ready for input.
+
+### Try Your First Task
+
+Type a task in natural language and send it. For example:
+
+```
+Add a REST endpoint to my Express app that returns all users
+```
+
+The orchestrator will:
+
+1. Read your project structure and identify Express as the framework.
+2. Route the task to the `webdev` specialist agent.
+3. Implement the endpoint following your existing conventions.
+4. Run any available linter, type-checker, or test suite.
+5. Pass the result to `code-reviewer` for a correctness and security check.
+6. Report back with a concise summary of what changed and what was verified.
+
 </Steps>
 
-<Tip>
-  Give people a way to get help. This could be a link to a support page, a chat with a customer support agent, or a forum for your product.
+## What Happens Next
 
-  Example: Need help? Reach out to us at [support@yourcompany.com](mailto:support@yourcompany.com).
-</Tip>
+Every task you send flows through the same routing pipeline. The orchestrator reads the request, inspects the repository, and decides whether to handle the task directly (for small, obvious changes like fixing a typo or renaming a variable) or delegate it to a specialist.
+
+For **domain-specific work** — a Rust function, a React component, a FiveM Lua script — it picks the matching specialist and hands off. For **multi-domain work** — say, a C# API feeding data to a Vue frontend — it delegates each side to its own specialist, then coordinates the results before review.
+
+After any substantial implementation, the `code-reviewer` agent checks for correctness, bugs, security issues, missing error handling, and unnecessary changes. Only after that pass does the orchestrator report back to you.
+
+To learn which specialist handles which technology, see the [Agents Overview](/agents/overview).

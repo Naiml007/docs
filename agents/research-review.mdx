@@ -1,0 +1,140 @@
+---
+title: "Research, Testing, and Code Review Agents"
+sidebarTitle: "Research & Review"
+description: "The planner, developer, researcher, tester, and code-reviewer agents ensure every feature is well-planned, grounded in accurate facts, and verified before it ships."
+---
+
+Quality implementation is more than writing code. This group of agents handles the stages that come before and after a specialist writes a single line: structured planning, external research, test coverage, and post-implementation review. Together they form the safety layer of the pack — catching problems early, grounding decisions in accurate information, and catching anything that slips through before it reaches production. The orchestrator calls several of these automatically, but you can invoke any of them directly when you need a focused pass.
+
+---
+
+## Planner
+
+The `planner` agent breaks a feature or bug report down into an ordered, testable task list that the `dev` agent (or a specialist) can follow step by step. It does **not** write or edit code — its only output is a structured plan.
+
+**Use it when:** you're about to start a complex feature and want a clear implementation roadmap before anyone touches the codebase.
+
+**Permissions:** file edits are denied, shell commands are denied. The planner is a thinking-only agent.
+
+**What the planner does:**
+1. Clarifies scope and constraints — asks if anything is ambiguous
+2. Breaks the work into small, ordered, testable tasks
+3. Notes which files and modules are likely affected
+4. Flags risks and design decisions that need a human call
+
+**Sample plan output:**
+
+```text
+## Plan: Add user authentication to the Express API
+
+1. Install and configure `passport` and `passport-jwt` packages
+2. Create `src/middleware/auth.ts` — JWT verification middleware
+3. Add `POST /auth/login` endpoint that issues a signed JWT on valid credentials
+4. Add `POST /auth/register` endpoint with input validation
+5. Protect existing `/api/users` and `/api/products` routes with auth middleware
+6. Write integration tests for login, register, and a protected route
+7. Update `.env.example` with required JWT_SECRET variable
+
+Risks:
+- Token expiry strategy needs a human decision (sliding vs. absolute)
+- Password hashing algorithm should match any existing user records
+```
+
+---
+
+## Developer
+
+The `dev` agent is the general-purpose implementation agent for tasks that don't need a domain-specific specialist. It follows your project's existing conventions and style, keeps changes scoped to the task, and never touches unrelated code.
+
+**Use it when:** the task is straightforward implementation work in a language the specialists don't specifically target, or when the orchestrator has already produced a plan and you want a focused execution agent.
+
+**Key behaviors:**
+- Reads and follows existing project conventions before writing anything
+- Keeps changes scoped — no unrelated refactors
+- Loads the `deslop` skill for a final cleanup pass after substantial AI-generated changes
+- Stops and asks rather than guessing when the task is ambiguous
+
+**Skills it can load:** `deslop`
+
+---
+
+## Researcher
+
+The `researcher` agent handles external technical research — looking up APIs, checking documentation, verifying version-specific behavior, and identifying the right library for a job. It **cannot edit files**, so its output is always information rather than implementation.
+
+**Use it when:**
+- You're working with an API you haven't used before
+- You need to verify behavior against official documentation
+- The right library or package for a task is unclear
+- A dependency has had breaking changes across versions
+- You want accurate facts before you commit to an approach
+
+**What it researches:**
+- Unfamiliar APIs and SDKs (FiveM APIs, C# / .NET APIs, Rust crates, and more)
+- Framework and library documentation
+- Version-specific behavior and configuration options
+- Breaking changes and migration paths
+
+<Note>
+  The researcher prefers official documentation over community sources. It always checks the version your project is actually using rather than assuming the latest.
+</Note>
+
+---
+
+## Code Researcher
+
+The `code-researcher` agent is a deeper research specialist that grounds every answer in official docs, GitHub repositories, Stack Overflow, and reputable engineering sources. Like the `researcher`, it **cannot edit files** — it produces distilled, actionable intelligence for you or another agent to act on.
+
+**Use it when:**
+- You're debugging an error and need to understand its root cause before touching code
+- You need the correct usage of a library API with a working example
+- You want cross-referenced, sourced answers rather than a best guess
+
+**How it works:**
+
+The code-researcher consults sources in a strict hierarchy — official docs first, then official GitHub repos, then well-maintained community resources. It cross-references critical facts across at least two sources, checks for deprecated methods and version-specific behavior, and flags any discrepancies it finds.
+
+Every response includes: a TL;DR answer, detailed findings with attributed code snippets, a recommendation, numbered sources, and a confidence level.
+
+**Skills it can load:** `find-skills` (when asked to discover or install a new capability)
+
+---
+
+## Tester
+
+The `tester` agent writes and runs tests for your code changes. It has full edit and shell access so it can create test files, run the test suite, and report results directly.
+
+**Use it when:** new logic needs test coverage, you want regression tests for a bug fix, or you want a dedicated pass that focuses only on test quality rather than mixing testing with implementation.
+
+**What it does:**
+1. Identifies what needs coverage — new logic, edge cases, and regression scenarios
+2. Writes or updates tests following your project's existing test framework and conventions
+3. Runs the full test suite and reports a clear pass / fail result
+4. Summarizes any failures — it does not silently fix unrelated code
+
+**Permissions:** file edits are allowed, shell commands are allowed.
+
+---
+
+## Code Reviewer
+
+The `code-reviewer` agent reviews completed implementation work and reports findings. It **cannot edit files** — its role is to surface problems with a clear severity, file location, affected code, explanation, and recommended fix. If the implementation is correct, it explicitly says so.
+
+**What it checks:**
+
+- **Correctness** — does the code do what it's supposed to do?
+- **Bugs** — off-by-one errors, null dereferences, incorrect logic
+- **Security** — injection, authentication flaws, secret exposure, improper input validation
+- **Regressions** — changes that break existing behavior
+- **Error handling** — unhandled exceptions, silent failures, missing fallbacks
+- **Performance** — unnecessary allocations, N+1 queries, blocking calls
+- **API misuse** — wrong method signatures, deprecated APIs, incorrect usage patterns
+- **Concurrency** — race conditions, deadlocks, unsafe shared state
+- **Missing tests** — logic that has no coverage
+- **Unnecessary changes** — scope creep or unrelated modifications
+
+Each finding includes: severity, file, the relevant code, why it's a problem, and a recommended fix.
+
+<Tip>
+  The orchestrator automatically calls the `code-reviewer` after substantial implementation work — you don't need to trigger it manually for most tasks. You can also invoke it directly at any time to get a focused review of a specific changeset or pull request diff.
+</Tip>

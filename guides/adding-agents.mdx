@@ -1,0 +1,130 @@
+---
+title: "Add and Customize Agents in Your Project"
+sidebarTitle: "Adding Agents"
+description: "Learn how to add new specialist agents, copy and modify existing ones, and configure frontmatter fields to control routing, models, and permissions."
+---
+
+Every agent in the Naimur OpenCode Agents pack is a plain Markdown file that lives in the `agents/` directory. A YAML frontmatter block at the top of each file tells opencode how to load and route to that agent — what model to use, whether users can invoke it directly, and which skills or shell capabilities it is allowed to access. You can create brand-new specialist agents or tweak existing ones simply by editing these files.
+
+## Agent File Structure
+
+Each agent file opens with a frontmatter block between `---` delimiters. The fields below control the agent's identity and behavior.
+
+<Accordion title="frontmatter field reference">
+
+| Field | Required | Description |
+|---|---|---|
+| `description` | ✅ | A short plain-English summary of what this agent handles. The orchestrator reads this to decide when to route a task here. Make it specific — vague descriptions lead to poor routing. |
+| `mode` | ✅ | Either `primary` or `subagent`. See [Primary vs Subagent Mode](#primary-vs-subagent-mode) below. |
+| `model` | ✅ | The opencode model ID to run this agent on, e.g. `opencode/big-pickle`. |
+| `temperature` | ❌ | Sampling temperature as a decimal. Lower values (e.g. `0.2`) produce more deterministic, predictable output. Omit to use the model default. |
+| `permission` | ❌ | An object controlling what the agent can do. Accepts sub-keys `edit`, `bash`, and `skill`. |
+
+</Accordion>
+
+Here is a minimal agent file you can use as a starting point:
+
+```markdown
+---
+description: Python specialist for Django, Flask, FastAPI, and data science libraries.
+mode: subagent
+model: opencode/big-pickle
+permission:
+  skill:
+    deslop: allow
+---
+
+You are a senior Python developer. [Your system prompt here]
+```
+
+The body below the frontmatter is the agent's system prompt. Write it the same way you would write instructions for any AI assistant — define the agent's role, the technologies it handles, the conventions it must follow, and the verification steps it should run after making changes.
+
+## Adding a New Specialist
+
+<Steps>
+  <Step title="Create a new .md file in agents/">
+    Add a file like `agents/python.md`. The filename becomes the agent's ID — keep it short, lowercase, and descriptive (e.g. `python`, `devops`, `mobile`).
+  </Step>
+  <Step title="Write the frontmatter">
+    Set a specific `description` that covers the exact technologies and tasks this agent should handle. Set `mode: subagent` unless you want users to invoke it directly. Choose an appropriate `model` for the workload.
+
+    ```markdown
+    ---
+    description: Python specialist for Django, Flask, FastAPI, and data science libraries.
+    mode: subagent
+    model: opencode/big-pickle
+    temperature: 0.3
+    permission:
+      bash: allow
+      skill:
+        deslop: allow
+    ---
+    ```
+  </Step>
+  <Step title="Write the system prompt body">
+    Below the closing `---`, write the agent's full system prompt. Include its role, the exact technologies it handles, the conventions it must follow, a "before coding" checklist, and the verification steps it should run before reporting back. Study the existing agents in the `agents/` directory for formatting inspiration.
+  </Step>
+  <Step title="Add a routing rule in orchestrator.md">
+    Open `agents/orchestrator.md` and find the `## SPECIALIST ROUTING` section. Add a new subsection that tells the orchestrator when to delegate to your agent:
+
+    ```markdown
+    ### Python
+
+    Use `python` for:
+
+    - Python
+    - Django
+    - Flask
+    - FastAPI
+    - pandas
+    - NumPy
+    - pip / Poetry
+    - Python debugging
+    - Python architecture
+    ```
+
+    The agent ID in the `Use \`...\`` line must match the filename you chose in step 1 (without the `.md` extension).
+  </Step>
+  <Step title="Optionally add skill permissions">
+    If your new agent needs to load any skills, list them explicitly in the `permission.skill` block in the frontmatter. Because the global `opencode.json` denies all skills by default, your agent cannot load a skill unless you explicitly allow it here:
+
+    ```markdown
+    permission:
+      skill:
+        deslop: allow
+        frontend-design: allow
+    ```
+  </Step>
+</Steps>
+
+## Modifying Existing Agents
+
+You can edit any `.md` file inside `agents/` to adjust an existing agent's behavior. The most common changes are:
+
+- **Swap the model** — Change the `model` field to use a different AI model. For example, replace `opencode/big-pickle` with a faster or cheaper model for low-complexity agents, or a more capable model for agents that handle critical architectural work.
+- **Tune the description** — The orchestrator uses the `description` to decide routing. If your agent is being selected too often or not often enough, tighten or broaden the description to match your actual use patterns.
+- **Add or remove skill permissions** — Add a skill to `permission.skill` to let the agent load it, or remove an entry to revoke access. Remember that a skill must also exist in a discoverable skill source — just allowing it in the frontmatter is not enough if the skill is not installed.
+- **Edit the system prompt body** — You can rewrite the instructions below the frontmatter entirely. Update conventions, add new technology sections, or change the verification checklist to match your project's toolchain.
+
+## Primary vs Subagent Mode
+
+The `mode` field has exactly two valid values, and they control how opencode exposes the agent to you:
+
+<CardGroup cols={2}>
+  <Card title="primary" icon="user">
+    The agent appears in opencode's agent selector and can be invoked directly by the user. Use `primary` for top-level agents like the orchestrator that a user interacts with by name. There is usually only one or a small number of primary agents.
+  </Card>
+  <Card title="subagent" icon="arrow-right">
+    The agent is hidden from the user-facing selector and can only be invoked by another agent (typically the orchestrator). Use `subagent` for every specialist (e.g. `webdev`, `csharp`, `godot`) so that routing stays under orchestrator control.
+  </Card>
+</CardGroup>
+
+The orchestrator in this pack is set to `mode: primary` — it is the entry point you interact with. Every domain specialist (webdev, opencode, etc.) is `mode: subagent`, meaning the orchestrator picks them based on its routing rules rather than you selecting them manually.
+
+<Warning>
+  Changing the routing rules inside `agents/orchestrator.md` affects how **all** tasks are delegated across every specialist. A poorly written routing rule can cause the orchestrator to use the wrong specialist or skip delegation entirely. After editing the `## SPECIALIST ROUTING` section, test several representative tasks to confirm routing behaves as expected before committing your changes.
+</Warning>
+
+<Tip>
+  Ask the `opencode` agent to help you create a new agent — it automatically loads the `customize-opencode` skill, which validates frontmatter syntax, checks that referenced agent IDs exist, and reminds you about scope and permission best practices before writing anything.
+</Tip>

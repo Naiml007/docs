@@ -1,0 +1,68 @@
+---
+title: "customize-opencode: Safe OpenCode Config Modification"
+sidebarTitle: "Customize OpenCode"
+description: "The customize-opencode skill gives agents a safe, validated workflow for editing OpenCode config — preserving your providers, models, and permissions."
+---
+
+The `customize-opencode` skill gives agents the precise knowledge they need to modify your OpenCode configuration files safely. When the opencode agent or the orchestrator needs to touch `opencode.json`, agent Markdown files, skill definitions, MCP settings, or global rules, it loads this skill first. The skill enforces a structured workflow that validates every change and prevents accidental overwriting of your existing setup.
+
+## What It Does
+
+The `customize-opencode` skill encodes a safe, step-by-step configuration workflow that agents follow before and after making any change to your OpenCode setup.
+
+<Accordion title="Inspect before changing">
+  Before proposing any change, the agent inspects the current configuration and all affected agents or skills. It respects the difference between global and project-local scope so it never overrides a workspace setting with a global default.
+</Accordion>
+
+<Accordion title="Follow the official schema">
+  The agent prefers the documented OpenCode schema and current official documentation when syntax or behavior may have changed, rather than guessing at field names or values.
+</Accordion>
+
+<Accordion title="Keep agents narrowly scoped">
+  When creating or editing an agent, the skill instructs the agent to give it only the skills and permissions its role actually needs — and to state *when* a skill must be loaded rather than just listing it.
+</Accordion>
+
+<Accordion title="Validate every change">
+  After editing any JSON or JSONC file, the agent parses it to confirm it is valid. It checks every agent frontmatter block, confirms all referenced agent IDs exist, and verifies that each enabled skill is discoverable and its directory name matches its skill ID. Any unsupported setting, duplicate ID, or unavailable dependency is reported rather than silently skipped.
+</Accordion>
+
+The skill covers the following areas of your OpenCode configuration:
+
+- **Agents** — creating, editing, and scoping agent Markdown files
+- **Skills** — adding skill references, setting permission blocks, managing skill IDs
+- **Permissions** — adding or tightening permission grants without over-granting
+- **Plugins** — enabling or configuring OpenCode plugin entries
+- **MCP configuration** — adding, editing, or removing MCP server entries in `opencode.json`
+- **Global rules** — modifying workspace-level or project-level rule files
+
+## Which Agents Use It
+
+Two agents in this pack declare `customize-opencode: allow` in their permission blocks:
+
+- **opencode agent** — loads `customize-opencode` before modifying any OpenCode agents, skills, permissions, plugins, MCP configuration, or global rules
+- **orchestrator** — loads `customize-opencode` as part of its core configuration management responsibilities, ensuring the same safe workflow applies when the orchestrator itself touches your setup
+
+## When It's Loaded
+
+The agent loads this skill automatically in situations such as:
+
+- Adding or editing an agent definition file
+- Changing permission grants for an agent
+- Setting up or updating an MCP server entry
+- Adding a new skill to an agent's permission block
+- Modifying global or project-level rules
+- Troubleshooting a configuration that isn't behaving as expected
+
+## Example
+
+To add a new MCP server to your OpenCode setup, simply ask the opencode agent:
+
+```text
+Add a new MCP server called "my-tool" that runs "node mcp-server.js"
+```
+
+The opencode agent will load `customize-opencode`, inspect your current `opencode.json`, add the new MCP server entry using the correct schema, validate the resulting JSON, and tell you if any restart or reload is required.
+
+<Warning>
+  The `customize-opencode` skill preserves your existing provider, model, and permission choices unless you explicitly ask to change them. If you want to update a model or swap a provider, say so directly — the agent will not assume you want those changed as a side effect of another edit.
+</Warning>

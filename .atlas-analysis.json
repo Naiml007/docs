@@ -1,0 +1,92 @@
+{
+  "projectType": "general",
+  "projectName": "Naimur OpenCode Agents",
+  "projectDescription": "A ready-to-use collection of specialized AI coding agents, skills, and configuration for the opencode platform — covering web, game development, system programming, and automated project documentation.",
+  "theme": "luma",
+  "primaryColor": "#6366F1",
+  "lightColor": "#818CF8",
+  "darkColor": "#4338CA",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "configuration"
+            ]
+          },
+          {
+            "group": "Agents",
+            "pages": [
+              "agents/overview",
+              "agents/orchestrator",
+              "agents/specialists",
+              "agents/research-review"
+            ]
+          },
+          {
+            "group": "Skills",
+            "pages": [
+              "skills/overview",
+              "skills/customize-opencode",
+              "skills/design",
+              "skills/unity-cli"
+            ]
+          },
+          {
+            "group": "Project Docs CLI",
+            "pages": [
+              "cli/overview",
+              "cli/usage",
+              "cli/automation"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/adding-agents",
+              "guides/mcp-setup",
+              "guides/permissions"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Orchestrator agent that routes tasks to the right specialist automatically",
+    "Domain-specific coding agents for Rust, C#, Web, FiveM, Discord, Unity, and Godot",
+    "Planning agent for structured feature breakdown before implementation",
+    "Code review agent for correctness, security, and regression checks",
+    "Research agents for grounding implementation in accurate, current documentation",
+    "Reusable skills for OpenCode configuration, UI design, and Unity CLI workflows",
+    "GitHub Project Docs CLI tool for generating repository documentation automatically",
+    "MCP integration support (e.g., Godot via ziva-local bridge)"
+  ],
+  "publicApiSurface": [
+    "agents/orchestrator — primary agent: routes tasks to specialists",
+    "agents/planner — breaks features into ordered, testable task lists",
+    "agents/dev — general implementation agent",
+    "agents/csharp — C# / .NET / ASP.NET specialist",
+    "agents/rust — Rust / Cargo / async specialist",
+    "agents/webdev — React, Next.js, Vue, Node.js, full-stack web specialist",
+    "agents/fivem — FiveM Lua / ESX / QBCore specialist",
+    "agents/discord — Discord bot and Cloudflare Workers specialist",
+    "agents/unity — Unity gameplay, rendering, DOTS/ECS specialist",
+    "agents/godot — Godot 4 GDScript and C# specialist",
+    "agents/researcher — external API and documentation research specialist",
+    "agents/code-researcher — code-grounded technical research specialist",
+    "agents/code-reviewer — post-implementation review agent",
+    "agents/tester — test writing and execution agent",
+    "agents/opencode — OpenCode configuration specialist",
+    "skills/customize-opencode — safe OpenCode config modification skill",
+    "skills/awesome-design-md — UI/design reference skill",
+    "skills/unity-cli-helper — Unity CLI and Editor automation skill",
+    "bin/github-project-docs.js --repo OWNER/REPO [--ref REF] [--output FILE] [--include-source] [--max-source-lines N]",
+    "opencode.json — workspace-level opencode configuration (default_agent, permissions, MCP servers)"
+  ]
+}

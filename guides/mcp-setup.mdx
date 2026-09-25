@@ -1,0 +1,116 @@
+---
+title: "Set Up MCP Server Integrations in opencode"
+sidebarTitle: "MCP Setup"
+description: "Learn what MCP is, how to register MCP servers in opencode.json, and how the Godot MCP bridge connects your game engine to your AI agents."
+---
+
+MCP (Model Context Protocol) is an open standard that lets AI agents talk to external tools, services, and context providers through a structured interface. Instead of hard-coding every capability inside an agent's system prompt, you register an MCP server once in `opencode.json` and any agent that needs it can call it at runtime. Common uses include connecting to game engines, design tools, databases, local services, and third-party APIs — anything that exposes an MCP-compatible endpoint.
+
+## MCP in opencode.json
+
+All MCP servers are declared under the top-level `mcp` key in `opencode.json`. Each entry is a named server object with three fields:
+
+```json
+{
+  "mcp": {
+    "server-name": {
+      "command": "path/to/executable",
+      "args": ["--flag", "value"],
+      "enabled": true
+    }
+  }
+}
+```
+
+<Accordion title="Field reference">
+
+| Field | Type | Description |
+|---|---|---|
+| `command` | string | Absolute path to the MCP server executable. opencode launches this process when the server is needed. |
+| `args` | string[] | Array of command-line arguments passed to the executable on startup. Use this to point the server at a specific binary, upstream URL, or configuration flag. |
+| `enabled` | boolean | Set to `true` to activate the server, or `false` to disable it without removing the config. Toggling this is the recommended way to turn a server on or off temporarily. |
+
+</Accordion>
+
+You can register as many named servers as you need — each key under `mcp` is independent, and opencode manages their processes separately.
+
+## Example: Godot MCP Integration
+
+The `opencode.json` in this pack ships with a pre-configured MCP entry for Godot game development:
+
+```json
+{
+  "mcp": {
+    "ziva-godot": {
+      "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe",
+      "args": [
+        "--mcp-bridge",
+        "--godot-bin",
+        "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe",
+        "--upstream",
+        "http://localhost:7012/api/mcp"
+      ],
+      "enabled": true
+    }
+  }
+}
+```
+
+This configuration starts `zivacode.exe` in MCP bridge mode, which creates a live two-way connection between opencode and the Godot 4 editor. With this bridge active, the `godot` specialist agent can read your scene tree, inspect node properties, execute GDScript, and apply changes directly inside the running editor — without you copying and pasting code manually. The `--godot-bin` argument tells the bridge where your Godot installation lives, and `--upstream` points to the local MCP relay service that the bridge communicates through.
+
+<Note>
+  All paths in the MCP `command` and `args` fields are **absolute paths** resolved on your local machine. The example above uses the original author's Windows paths — you must update `command`, `--godot-bin`, and `--upstream` to match your own system before this integration will work.
+</Note>
+
+## Adding Your Own MCP Server
+
+<Steps>
+  <Step title="Find or build an MCP-compatible server">
+    Look for an existing MCP server for your tool (many are available as open-source packages), or build your own using an MCP SDK. The server must implement the Model Context Protocol and expose either a stdio or HTTP interface that opencode can connect to.
+  </Step>
+  <Step title="Add the server config to opencode.json">
+    Open `opencode.json` and add a new entry under the `mcp` key. Choose a descriptive, lowercase kebab-case name for your server:
+
+    ```json
+    {
+      "mcp": {
+        "my-tool": {
+          "command": "/absolute/path/to/my-mcp-server",
+          "args": ["--port", "8080"],
+          "enabled": true
+        }
+      }
+    }
+    ```
+
+    Make sure your new entry sits alongside any existing entries inside the same `mcp` object — do not create a second `mcp` key.
+  </Step>
+  <Step title="Set enabled to true">
+    Ensure `"enabled": true` is set for your new server. If you accidentally omit this field or set it to `false`, opencode will not start the server process.
+  </Step>
+  <Step title="Restart opencode">
+    opencode reads `opencode.json` at startup. Save the file, then restart opencode fully for the new MCP server to be registered and its process to be launched.
+  </Step>
+</Steps>
+
+## Disabling an MCP Server
+
+If you want to temporarily stop using an MCP server — for example while the upstream service is offline, or while you debug a connection issue — set `enabled` to `false` instead of deleting the entry:
+
+```json
+{
+  "mcp": {
+    "ziva-godot": {
+      "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe",
+      "args": ["--mcp-bridge", "--godot-bin", "..."],
+      "enabled": false
+    }
+  }
+}
+```
+
+This preserves your full configuration so you can re-enable it later with a single edit, without needing to remember or look up the original args. Restart opencode after toggling `enabled`.
+
+<Tip>
+  Ask the `opencode` agent to add or update MCP server entries for you. It loads the `customize-opencode` skill, which validates the JSON structure after every change and flags syntax errors, duplicate keys, or unsupported fields before they cause a silent failure at startup.
+</Tip>

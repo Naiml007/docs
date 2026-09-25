@@ -1,0 +1,115 @@
+---
+title: "The Orchestrator: Automatic Task Routing for opencode"
+sidebarTitle: "Orchestrator"
+description: "The orchestrator is the recommended default agent — it inspects your repo, selects the right specialist, and verifies every change automatically."
+---
+
+The orchestrator is the central agent in this pack and the recommended `default_agent` for most projects. Rather than asking you to pick a specialist yourself, it reads your request, inspects the repository, selects the right agent (or agents) for the job, coordinates their work, and verifies the result — all in one turn. You describe what you want in plain language and the orchestrator handles the rest.
+
+## How Routing Works
+
+Every task the orchestrator receives follows the same structured workflow:
+
+<Steps>
+  <Step title="Understand the goal">
+    The orchestrator reads your request carefully to determine what you actually want — not just the surface-level instruction, but the intent behind it.
+  </Step>
+  <Step title="Inspect the repository">
+    Before touching any code, it reads your project structure, configuration files, `package.json` / `Cargo.toml` / `.csproj`, and framework versions. It never invents architecture without looking at the repo first.
+  </Step>
+  <Step title="Select the right specialist">
+    Based on the technologies and files involved, it picks the most appropriate agent from the roster — or decides to handle the task directly if it's small enough.
+  </Step>
+  <Step title="Delegate domain-specific work">
+    For language- or framework-specific tasks, the orchestrator hands the work off to the relevant specialist (e.g., `csharp`, `webdev`, `rust`). For mixed projects, it coordinates multiple specialists in sequence.
+  </Step>
+  <Step title="Verify the result">
+    After implementation, the orchestrator runs your project's build, tests, linter, and type checker. It inspects the final diff and fixes any problems it finds before reporting back to you.
+  </Step>
+  <Step title="Return a concise summary">
+    You receive a clear, focused report: what changed, which specialists were used, what checks were run, and any remaining issues — without internal reasoning or noise.
+  </Step>
+</Steps>
+
+## Routing Rules
+
+The orchestrator applies a straightforward principle: delegate only when it adds value.
+
+**Handled directly** — small, obvious tasks that don't need a specialist:
+
+- Changing a hard-coded value
+- Fixing a typo in a string or comment
+- Renaming a variable
+- Making a small, localized bug fix in familiar code
+
+**Delegated to a specialist** — tasks that require deeper expertise:
+
+- Substantial new implementation
+- Domain-specific knowledge (e.g., Rust ownership patterns, Unity DOTS, FiveM networking)
+- Changes spanning multiple files
+- Unfamiliar framework behavior or debugging
+- Architectural decisions
+
+When in doubt, the orchestrator inspects the repo before deciding. It will not invent an approach without understanding the existing codebase.
+
+## Multi-Domain Tasks
+
+When a task touches more than one technology stack, the orchestrator coordinates multiple specialists rather than handing everything to a single agent. Each specialist handles its own domain, and the orchestrator integrates the results and runs a cross-domain review.
+
+**Example — C# backend + React frontend:**
+
+1. Delegates backend API work to the `csharp` specialist
+2. Delegates frontend component work to the `webdev` specialist
+3. Coordinates the two implementations and checks their integration
+4. Sends the completed diff to `code-reviewer` for a final review
+
+You make one request. The orchestrator figures out who does what.
+
+## Verification
+
+The orchestrator does not report success without checking. After every implementation, it runs:
+
+- **Build** — compiles the project and checks for errors
+- **Tests** — runs the relevant test suite and reports failures
+- **Linter / formatter** — runs the project's configured lint or format checks
+- **Compiler / type errors** — reads compiler output and TypeScript / type-checker results
+- **Diff review** — inspects the final changeset for unnecessary modifications
+
+If a check cannot be run (for example, no GPU available for a Unity Editor check), the orchestrator tells you explicitly rather than silently skipping it.
+
+## Example Prompts
+
+```text
+Add a REST endpoint to my Express app that returns all users
+```
+
+```text
+Fix the NullReferenceException in PlayerController.cs
+```
+
+```text
+Write unit tests for the auth middleware
+```
+
+```text
+Research the best way to implement rate limiting in Rust
+```
+
+```text
+My FiveM resource crashes when a player disconnects — find and fix the bug
+```
+
+## Setting the Orchestrator as Your Default Agent
+
+<Note>
+  To make the orchestrator your default agent in opencode, add the following to your `opencode.json`:
+
+  ```json
+  {
+    "$schema": "https://opencode.ai/config.json",
+    "default_agent": "orchestrator"
+  }
+  ```
+
+  With this set, every new conversation starts with the orchestrator automatically — you never have to select an agent manually for day-to-day work.
+</Note>

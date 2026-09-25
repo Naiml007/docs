@@ -1,0 +1,126 @@
+---
+title: "unity-cli-helper: Unity Editor and CLI Automation"
+sidebarTitle: "Unity CLI"
+description: "The unity-cli-helper skill gives the unity agent accurate commands for headless builds, module installs, license activation, CI patterns, and diagnostics."
+---
+
+The `unity-cli-helper` skill gives the unity agent precise, schema-accurate knowledge for every Unity command-line task. When you ask the unity agent to install an editor, manage modules, activate a license, set up a CI pipeline, or run diagnostics, it loads this skill before responding. The skill ensures the agent produces exact commands with the correct flags — not approximations — and warns you when a step could fail in a non-interactive or CI environment.
+
+## What It Covers
+
+<Accordion title="Unity executable CLI flags for headless builds">
+  The skill documents the full set of flags for running Unity in batch mode: version aliases (`latest`, `lts`, `default`, or a stream like `6` or `2022`), changeset overrides with `-c`/`--changeset`, architecture selection on macOS with `-a`/`--architecture`, and child-module auto-installation with `--cm`/`--childModules`.
+</Accordion>
+
+<Accordion title="Module management and installation">
+  Installing modules at the same time as an editor (`-m`/`--module`), adding modules to an already-installed editor (`unity install-modules`), and handling child modules that a primary module depends on.
+</Accordion>
+
+<Accordion title="License activation">
+  Authenticating with `unity auth` and managing seat licenses with `unity license`, including the considerations the skill flags for non-interactive terminal environments.
+</Accordion>
+
+<Accordion title="CI integration patterns">
+  Best-practice command patterns for CI and automation, including the requirement to specify an explicit version — running without a version in a non-interactive terminal can cause the command to fail or block.
+</Accordion>
+
+<Accordion title="Diagnostic and configuration commands">
+  Running environment checks with `unity doctor`, reading CLI logs with `unity logs`, and inspecting or changing editor download directories with `unity install-path`.
+</Accordion>
+
+<Accordion title="Connected Editor and AI/MCP features">
+  Forwarding commands to a connected live Editor with `unity command` (`cmd`), starting an MCP server with `unity mcp`, and checking live Editor state with `unity status`.
+</Accordion>
+
+## Common Commands
+
+These are real commands from the skill — the unity agent uses exactly this syntax when it loads `unity-cli-helper`.
+
+**Upgrade or get help for the CLI itself:**
+
+```bash
+unity upgrade
+unity <command> --help
+unity <command> <subcommand> --help
+```
+
+**Install the latest Unity Editor:**
+
+```bash
+unity install latest
+```
+
+**Install a specific version with Android and iOS modules:**
+
+```bash
+unity install 2022.3.0f1 -m android -m ios
+```
+
+**Add modules to an already-installed editor (with child modules):**
+
+```bash
+unity install-modules -e 2022.3.0f1 -m android --cm
+```
+
+**List all installed editors:**
+
+```bash
+unity editors --installed
+```
+
+**Set or get the default editor:**
+
+```bash
+unity editors default 2022.3.0f1
+```
+
+**Add a local editor path:**
+
+```bash
+unity editors add /path/to/Unity.app
+```
+
+**Open a project:**
+
+```bash
+unity open
+```
+
+**Build, run, or test a project:**
+
+```bash
+unity build
+unity run
+unity test
+```
+
+**Manage licenses and authentication:**
+
+```bash
+unity auth
+unity license
+```
+
+**Run diagnostics and read logs:**
+
+```bash
+unity doctor
+unity logs
+```
+
+**Start an MCP server or check Editor state:**
+
+```bash
+unity mcp
+unity status
+```
+
+## When It's Loaded
+
+The unity agent loads `unity-cli-helper` selectively — only when the task involves CLI, Editor, module, license, CI, or diagnostic commands. For general Unity development work (gameplay, rendering, DOTS/ECS, performance), the agent uses its other skills and does not load this one unnecessarily.
+
+If a flag or option you need isn't covered by the skill's documented schema, the agent will direct you to run `unity <command> --help` against your locally installed CLI version to confirm the exact syntax.
+
+<Note>
+  The `unity-cli-helper` skill is loaded automatically by the unity agent — you don't need to reference it in your prompts. Just ask for what you want, such as "install Unity 6 with WebGL support" or "show me how to run tests in CI," and the agent will load the skill and provide accurate commands.
+</Note>

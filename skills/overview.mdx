@@ -1,0 +1,50 @@
+---
+title: "Skills: Loadable Knowledge Modules for Agents"
+sidebarTitle: "Overview"
+description: "Skills are loadable knowledge modules agents pull in on demand, extending their capabilities for design, Unity CLI, and OpenCode configuration tasks."
+---
+
+Skills are focused knowledge modules that agents load on demand when a task calls for specialized expertise. Unlike agents — which handle broad domains — each skill carries a precise, self-contained body of knowledge: guidelines, command patterns, workflow rules, or design references. When you ask an agent to do something within a skill's domain, the agent pulls that skill in automatically and applies its knowledge before responding. You never need to name or invoke a skill yourself.
+
+## How Skills Work
+
+Skills live in the `skills/` directory of the Naimur OpenCode Agents pack. Each skill is a folder containing a `SKILL.md` file with two things: a short frontmatter block that declares the skill's `name` and `description`, and the actual knowledge content the agent reads at load time.
+
+Agents declare which skills they are permitted to load in their frontmatter `permission` block:
+
+```yaml
+permission:
+  skill:
+    customize-opencode: allow
+    unity-cli-helper: allow
+```
+
+Only skills listed as `allow` can be loaded by that agent. If you use a global `opencode.json` to set `skill.*` to `deny` by default, every skill must be explicitly opted in per agent — nothing loads silently.
+
+Agents decide *when* to load a skill based on the task. The agent's own instructions describe the exact conditions: for example, the unity agent loads `unity-cli-helper` only for CLI, Editor, module, license, CI, or diagnostic commands — not for every Unity question.
+
+## Skills in This Pack
+
+| Skill Name | Loaded By | Purpose |
+|---|---|---|
+| `customize-opencode` | opencode agent, orchestrator | Safe OpenCode configuration modification — agents, skills, permissions, MCP, plugins, and global rules |
+| `awesome-design-md` | webdev agent | UI and design reference using curated real-world DESIGN.md files for brand-aligned frontend work |
+| `unity-cli-helper` | unity agent | Precise Unity CLI flags, module management, license activation, CI patterns, and diagnostics |
+
+## Explore the Skills
+
+<CardGroup cols={2}>
+  <Card title="Customize OpenCode" icon="sliders" href="/skills/customize-opencode">
+    Safe OpenCode config modification for agents, skills, permissions, plugins, MCP, and global rules.
+  </Card>
+  <Card title="Design" icon="palette" href="/skills/design">
+    Curated DESIGN.md references for brand-aligned UI and frontend development.
+  </Card>
+  <Card title="Unity CLI" icon="terminal" href="/skills/unity-cli">
+    Unity Editor and CLI automation for builds, modules, licenses, and CI workflows.
+  </Card>
+</CardGroup>
+
+<Note>
+  Skills are loaded automatically by agents based on the task at hand — you don't need to invoke them manually or mention them in your prompts. Just describe what you want to do, and the agent will load the right skill when it needs it.
+</Note>

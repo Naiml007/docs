@@ -1,0 +1,167 @@
+---
+title: "Agent and Skill Permissions: Control What Agents Can Do"
+sidebarTitle: "Permissions"
+description: "Understand how to allow or deny file edits, shell access, and skill loading per agent, and how the global skill lock in opencode.json sets the baseline."
+---
+
+opencode's permission system gives you precise control over what each agent is allowed to do inside your workspace. You can restrict an agent to read-only inspection, permit it to run shell commands, or limit exactly which skills it can load — all without touching the agent's system prompt. Permissions are declared in two places: a global baseline in `opencode.json` and per-agent overrides in each agent's frontmatter block.
+
+## Global Permissions in opencode.json
+
+The top-level `permission` key in `opencode.json` sets the default policy that applies across the entire workspace before any agent-specific rules are evaluated. In this pack, skills are locked down globally:
+
+```json
+{
+  "permission": {
+    "skill": {
+      "*": "deny"
+    }
+  }
+}
+```
+
+Setting `skill.*` to `"deny"` means **no agent can load any skill by default**. This is a security-first baseline — it prevents a newly added agent from accidentally inheriting broad skill access just because it exists. Every agent that needs to use a skill must explicitly allow it in its own frontmatter.
+
+<Note>
+  The `*` wildcard applies to all skill names. You can also set a global default for a specific skill (e.g. `"deslop": "deny"`) if you want to block a particular skill everywhere and only allow it in select agents.
+</Note>
+
+## Per-Agent Permissions
+
+Each agent's `.md` file can include a `permission` block in its frontmatter that adds to or overrides the global policy. Three sub-keys are available:
+
+### permission.edit
+
+Controls whether the agent is allowed to create or modify files in your workspace.
+
+```markdown
+---
+permission:
+  edit: deny
+---
+```
+
+Set `edit: deny` for agents that should only read and analyze — for example, a planner or a researcher that should never touch source files. Omit `edit` or set it to `allow` for agents that need to write code.
+
+### permission.bash
+
+Controls whether the agent is allowed to execute shell commands.
+
+```markdown
+---
+permission:
+  bash: allow
+---
+```
+
+Agents with `bash: allow` can run build tools, test runners, linters, and arbitrary shell commands in your project directory. The `webdev` agent, for instance, has `bash: allow` so it can run `npm`, `pnpm`, type checkers, and build scripts after making changes.
+
+### permission.skill.\<name\>
+
+Allows a specific named skill for this agent, overriding the global `skill.*: deny`:
+
+```markdown
+---
+permission:
+  skill:
+    customize-opencode: allow
+    find-skills: allow
+---
+```
+
+Each key under `permission.skill` is a skill ID (matching the skill's directory name and `name` frontmatter). Set the value to `allow` to let the agent load it, or `deny` to explicitly block it even if a broader rule would permit it.
+
+## Permission Levels
+
+Every permission value is one of two strings:
+
+<CardGroup cols={2}>
+  <Card title="allow" icon="check">
+    The agent can use this capability. For skills, this means the agent may load and execute that skill during a task. For `edit` and `bash`, it means the agent may perform file writes and shell commands respectively.
+  </Card>
+  <Card title="deny" icon="x">
+    The capability is explicitly blocked for this agent — even if a broader or global rule would otherwise permit it. `deny` always wins when there is a conflict between a specific rule and a wildcard.
+  </Card>
+</CardGroup>
+
+## Common Configurations
+
+Here are practical permission setups for the most common agent roles:
+
+<Accordion title="Read-only research agent">
+An agent that should inspect code, search documentation, and report findings — but never write files or run commands.
+
+```markdown
+---
+description: Research specialist for API documentation and library behavior.
+mode: subagent
+model: opencode/big-pickle
+permission:
+  edit: deny
+  bash: deny
+  skill:
+    find-skills: allow
+---
+```
+</Accordion>
+
+<Accordion title="Full implementation agent">
+An agent that needs to write code, run builds, execute tests, and apply linting fixes.
+
+```markdown
+---
+description: Backend API developer for Node.js, Express, and PostgreSQL.
+mode: subagent
+model: opencode/big-pickle
+permission:
+  bash: allow
+  skill:
+    deslop: allow
+---
+```
+
+`edit` is omitted here — agents can edit files by default unless `edit: deny` is set. Only set `edit: deny` when you want to explicitly block it.
+</Accordion>
+
+<Accordion title="Skills-restricted agent">
+An agent that is allowed to run the shell but can only load one specific skill, with all others denied.
+
+```markdown
+---
+description: OpenCode configuration specialist for agents, skills, and MCP setup.
+mode: subagent
+permission:
+  skill:
+    customize-opencode: allow
+    find-skills: allow
+---
+```
+
+Because the global config sets `skill.*: deny`, only `customize-opencode` and `find-skills` are accessible to this agent. Any other skill it might try to load will be blocked automatically.
+</Accordion>
+
+## Skill Permission Flow
+
+When an agent tries to load a skill, opencode evaluates permissions in this order:
+
+<Steps>
+  <Step title="Start with the global baseline">
+    opencode reads the `permission` block in `opencode.json`. In this pack, `skill.*: deny` means all skills start as blocked for every agent.
+  </Step>
+  <Step title="Apply per-agent overrides">
+    opencode reads the `permission.skill` block in the agent's own frontmatter. Any skill listed with `allow` is added to that agent's permitted set, regardless of the global deny.
+  </Step>
+  <Step title="Evaluate the request">
+    When the agent attempts to load a skill at runtime, opencode checks the final resolved policy for that agent and skill name. If no `allow` entry exists, the load is blocked and the agent receives an error.
+  </Step>
+</Steps>
+
+This means the effective skill list for any agent is exactly and only what appears in its `permission.skill` block — nothing more, nothing less.
+
+<Warning>
+  Be careful when granting `bash: allow` to an agent. An agent with shell access can run arbitrary commands in your project directory — including destructive ones. Only grant `bash: allow` to agents that genuinely need to run build tools, tests, or package managers, and keep the agent's system prompt tightly scoped so it knows what commands are appropriate.
+</Warning>
+
+<Tip>
+  Start with `skill.*: deny` globally (already configured in this pack's `opencode.json`) and add explicit `allow` entries only in the agents that need them. This approach means every skill access is a deliberate, visible decision — you can audit exactly what each agent can load by reading its frontmatter, with no hidden inherited permissions to track.
+</Tip>

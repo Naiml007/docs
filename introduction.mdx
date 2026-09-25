@@ -1,0 +1,46 @@
+---
+title: "Naimur OpenCode Agents: AI Coding Specialists"
+sidebarTitle: "Introduction"
+description: "A ready-to-use pack of specialized AI coding agents, reusable skills, and a docs CLI that plugs directly into the opencode platform."
+---
+
+Naimur OpenCode Agents is a drop-in collection of specialized AI coding agents built for the [opencode](https://opencode.ai) platform. Instead of relying on a single general-purpose AI for every task, this pack routes each request to a specialist — a dedicated agent trained to reason about Rust ownership, React component trees, FiveM Lua resources, Unity scenes, and more — all coordinated by a central orchestrator that inspects your repository before making a single change.
+
+## What's In The Box
+
+The pack is organized into three layers that work together out of the box.
+
+**Agents** are the primary workers. Each agent has a narrow focus, its own model selection, and explicit permission boundaries. The orchestrator agent sits at the top of the hierarchy: it reads your codebase, picks the right specialist for the job, coordinates multi-domain tasks (for example, a C# backend paired with a React frontend), and then hands the final implementation to the code-reviewer agent before reporting back to you. Specialists cover C# / .NET, Rust, Web (React, Next.js, Vue, Node.js, Express), FiveM Lua, Discord bots, Unity, Godot, and more.
+
+**Skills** are reusable instruction modules that agents load on demand. Rather than baking every piece of knowledge into every agent, skills are composed in at runtime — `customize-opencode` for safe config edits, `unity-cli-helper` for accurate Unity CLI commands, and `awesome-design-md` for matching real-world brand design systems, among others.
+
+**Docs CLI** (`bin/github-project-docs.js`) is a Node.js command-line tool that generates a structured Markdown document describing every tracked file in a repository, complete with language stats, file purposes, and GitHub links. It is useful for feeding project context to a code-understanding model or keeping living documentation up to date automatically via the included GitHub Actions workflow.
+
+## Who It's For
+
+This pack is designed for developers who already use opencode and want instant, correct routing to the right specialist without writing or maintaining their own agent configurations. It is especially useful if you:
+
+- Work across multiple languages or frameworks in the same project
+- Want a code-review step built into every substantial implementation
+- Need accurate, up-to-date framework guidance (the researcher and code-researcher agents verify documentation before advising)
+- Build games in Unity or Godot, server scripts for FiveM, or bots for Discord
+- Prefer a configuration-as-code approach where agent behavior is transparent and version-controlled
+
+If you have used opencode with only the default model, this pack turns it into a team of specialists that hands work off, reviews its own output, and tells you exactly what changed.
+
+## Explore the Pack
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/quickstart">
+    Install the agents and run your first task in under five minutes.
+  </Card>
+  <Card title="Agents Overview" icon="robot" href="/agents/overview">
+    Meet every specialist agent and learn when the orchestrator routes to each one.
+  </Card>
+  <Card title="Skills Overview" icon="puzzle-piece" href="/skills/overview">
+    Understand how reusable skills are loaded and what each one provides.
+  </Card>
+  <Card title="CLI Overview" icon="terminal" href="/cli/overview">
+    Generate living project documentation from any GitHub repository.
+  </Card>
+</CardGroup>

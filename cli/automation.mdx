@@ -1,0 +1,106 @@
+---
+title: "Automate Project Docs with GitHub Actions"
+sidebarTitle: "Automation"
+description: "Use the included GitHub Actions workflow to auto-generate and commit PROJECT_DOCUMENTATION.md on every push to your repository's default branch."
+---
+
+The `naimur-opencode-agents` repository ships with a ready-to-use GitHub Actions workflow that automatically generates `PROJECT_DOCUMENTATION.md` and commits it back to your repository on every push. Once you add the workflow file, your project documentation stays current without any manual steps — every code change triggers a fresh documentation run.
+
+## The Included Workflow
+
+The workflow file lives at `.github/workflows/project-documentation.yml`. Here is what it does and when it runs:
+
+**Triggers:**
+
+- **Push to any branch** — the workflow runs on every push, but ignores pushes that only change `PROJECT_DOCUMENTATION.md` itself (to avoid an infinite commit loop).
+- **Manual dispatch (`workflow_dispatch`)** — you can also trigger it by hand from the GitHub Actions tab at any time.
+
+**Steps:**
+
+1. **Check out repository** — uses `actions/checkout@v4` to clone the repository at the commit that triggered the workflow.
+2. **Set up Node.js** — installs Node.js 20 using `actions/setup-node@v4`.
+3. **Generate documentation** — runs `github-project-docs.js` with `--repo` set to the current repository and `--ref` set to the triggering commit SHA, so the generated links always point to the exact snapshot.
+4. **Commit documentation when changed** — configures git as the `github-actions[bot]` user, stages `PROJECT_DOCUMENTATION.md`, and commits it with the message `docs: update project documentation`. If the file has not changed, the step exits cleanly without creating an empty commit.
+
+The full workflow YAML is shown below:
+
+```yaml
+name: Generate project documentation
+
+on:
+  push:
+    paths-ignore:
+      - PROJECT_DOCUMENTATION.md
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  document:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Generate documentation
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node bin/github-project-docs.js --repo "${{ github.repository }}" --ref "${{ github.sha }}" --output PROJECT_DOCUMENTATION.md
+
+      - name: Commit documentation when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add PROJECT_DOCUMENTATION.md
+          git diff --cached --quiet || git commit -m "docs: update project documentation"
+          git push
+```
+
+## Adding It to Your Repository
+
+<Steps>
+  <Step title="Copy the workflow file">
+    Copy `.github/workflows/project-documentation.yml` from the
+    `naimur-opencode-agents` repository into the `.github/workflows/` directory
+    of your own repository. Create the directory if it does not already exist.
+
+    ```bash
+    mkdir -p .github/workflows
+    cp /path/to/naimur-opencode-agents/.github/workflows/project-documentation.yml \
+       .github/workflows/project-documentation.yml
+    ```
+  </Step>
+  <Step title="Grant workflow write permissions">
+    The workflow commits the generated file back to your repository, so the
+    GitHub Actions bot needs write access. In your repository, go to **Settings
+    → Actions → General → Workflow permissions** and select **Read and write
+    permissions**, then save.
+  </Step>
+  <Step title="Push to trigger the workflow">
+    Commit and push the new workflow file. The push itself will trigger the
+    workflow on the current branch. You can watch it run live in the **Actions**
+    tab of your repository.
+  </Step>
+  <Step title="Find the generated file">
+    Once the workflow completes successfully, `PROJECT_DOCUMENTATION.md` is
+    committed to your repository at the root. Pull the latest changes locally or
+    view the file directly on GitHub.
+  </Step>
+</Steps>
+
+## Manual Trigger
+
+You can run the workflow at any time without pushing a code change. Open your repository on GitHub, navigate to **Actions → Generate project documentation**, and click **Run workflow**. Select the branch you want to document and confirm. This is useful when you want to refresh the documentation after updating repository metadata or descriptions on GitHub without touching any source files.
+
+<Note>
+  The workflow always commits the generated `PROJECT_DOCUMENTATION.md` back to
+  your repository, so the file is never stale. Every file link in the document
+  points to the exact commit SHA that triggered the run, giving you a precise
+  snapshot of the repository's structure at that point in time.
+</Note>

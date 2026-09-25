@@ -1,0 +1,86 @@
+---
+title: "Using the GitHub Project Docs CLI Tool"
+sidebarTitle: "Usage"
+description: "Run the CLI with node bin/github-project-docs.js, explore every available flag, and follow copy-paste examples to document any GitHub repository."
+---
+
+You run the CLI directly with Node.js from the root of the `naimur-opencode-agents` repository. The entry point is `bin/github-project-docs.js`. The only required argument is `--repo`; everything else is optional and has a sensible default. The tool calls the GitHub API through the `gh` CLI, so make sure you have authenticated with `gh auth login` before running any commands.
+
+## Basic Usage
+
+Pass the target repository in `OWNER/REPOSITORY` format to generate documentation with default settings:
+
+```bash
+node bin/github-project-docs.js --repo OWNER/REPOSITORY
+```
+
+This fetches the repository's default branch, documents every tracked file (excluding `.git`, `node_modules`, `dist`, and `build` directories), and writes the output to `PROJECT_DOCUMENTATION.md` in your current directory.
+
+## All Options
+
+<ParamField path="--repo" type="string" required>
+  The GitHub repository to document, in `OWNER/REPO` format (for example,
+  `octocat/Hello-World`). The authenticated `gh` token must have read access to
+  this repository.
+</ParamField>
+
+<ParamField path="--ref" type="string">
+  The branch, tag, or full commit SHA to document. Defaults to the repository's
+  configured default branch. Use this to pin documentation to a specific release
+  or to document a feature branch without changing the default.
+</ParamField>
+
+<ParamField path="--output" type="string" default="PROJECT_DOCUMENTATION.md">
+  The file path where the generated Markdown document is written. The path is
+  resolved relative to your current working directory. Intermediate directories
+  must already exist.
+</ParamField>
+
+<ParamField path="--include-source" type="boolean">
+  When present, the tool fetches the raw content of every text file and embeds a
+  fenced source excerpt inside each file's section in the output document. Binary
+  files and files larger than 1 MB are skipped automatically.
+</ParamField>
+
+<ParamField path="--max-source-lines" type="number" default="80">
+  The maximum number of lines to include in each source excerpt when
+  `--include-source` is active. Must be a positive integer. Lines beyond this
+  limit are omitted, and the document notes that the excerpt was truncated with a
+  link to the full file on GitHub.
+</ParamField>
+
+<ParamField path="--help, -h" type="boolean">
+  Print the help text describing all flags and example commands, then exit
+  immediately without generating any documentation.
+</ParamField>
+
+## Examples
+
+```bash
+# Document a public repository with default settings
+node bin/github-project-docs.js --repo octocat/Hello-World
+
+# Document a specific branch and write to a custom path
+node bin/github-project-docs.js --repo owner/project --ref main --output docs/project.md
+
+# Include source excerpts (up to 120 lines per file)
+node bin/github-project-docs.js --repo owner/project --include-source --max-source-lines 120
+```
+
+## Output Format
+
+The generated Markdown document follows a consistent structure every time:
+
+1. **Title and generation metadata** — the repository name, a link to the repo on GitHub, the generation date, the documented ref, and the total file count.
+2. **Repository overview** — the repository's description from GitHub.
+3. **File index table** — a Markdown table listing every tracked file with its language, size in bytes, purpose note, and a hyperlink to the file at the documented commit.
+4. **Per-file sections** — one `##`-level section per file containing the language, size, purpose note, and a direct GitHub link. When `--include-source` is active, each section also contains a fenced code block with the source excerpt.
+
+All file paths, languages, sizes, and purpose notes are derived entirely from the GitHub API — no local clone of the target repository is required.
+
+<Tip>
+  Pass `--include-source` when you plan to feed the generated document to a
+  language model for semantic code analysis. Embedding the actual source code
+  alongside the file index gives the model enough context to explain
+  implementations, identify patterns, and answer questions about the codebase.
+</Tip>

@@ -1,0 +1,44 @@
+---
+title: "Agent Roster: All Specialists at a Glance"
+sidebarTitle: "Overview"
+description: "Meet all 15 agents in the Naimur OpenCode Agents pack — from the routing orchestrator to language specialists, researchers, and reviewers."
+---
+
+Naimur OpenCode Agents is a ready-to-use collection of 15 specialized AI agents for the [opencode](https://opencode.ai) platform. In opencode, agents are Markdown files that define a model, permissions, and a system prompt — drop them into your project's `.opencode/agents/` folder (or install them globally) and they become available immediately. Instead of relying on a single general-purpose assistant, this pack gives you focused specialists for every major language, framework, and workflow stage so each task is handled by an agent with the right knowledge and the right guardrails.
+
+## All Agents at a Glance
+
+| Agent | Mode | What It Does |
+|---|---|---|
+| **orchestrator** | primary | Analyzes your request, inspects the repo, routes to the right specialist, and verifies the final result |
+| **planner** | primary | Breaks features into ordered, testable task lists — no code edits |
+| **dev** | primary | General-purpose implementation: writes and edits code following project conventions |
+| **csharp** | subagent | C#, .NET, ASP.NET, LINQ, async/await, Entity Framework, and NuGet specialist |
+| **rust** | subagent | Rust, Cargo, Tokio, async Rust, ownership / lifetimes / traits, WASM, and FFI specialist |
+| **webdev** | subagent | React, Next.js, Vue 3, TypeScript, Tailwind, Vite, Node.js, Express, REST APIs, WebSockets, MongoDB, PostgreSQL, and Prisma |
+| **fivem** | subagent | FiveM Lua resources, client/server scripts, NUI, ESX, QBCore, ox_lib, and fxmanifest.lua |
+| **discord** | subagent | Discord bots, slash commands, Gateway events, interactions, and Cloudflare Workers deployments |
+| **unity** | subagent | Unity C#, GameObjects, DOTS/ECS/Jobs/Burst, Unity packages, Editor tools, and Unity MCP |
+| **godot** | subagent | Godot 4 GDScript and C#, scenes / nodes, physics, 2D/3D, animation, shaders, multiplayer, and export |
+| **tester** | subagent | Writes and runs tests, reports failures clearly with full pass/fail output |
+| **researcher** | subagent | External research on APIs, libraries, and docs — no file edits |
+| **code-researcher** | subagent | Code-grounded technical research using official docs, GitHub, and Stack Overflow — no file edits |
+| **code-reviewer** | subagent | Post-implementation review checking correctness, security, bugs, and performance — no edits |
+| **opencode** | subagent | Manages OpenCode agents, skills, permissions, plugins, and MCP configuration safely |
+
+## Explore the Pack
+
+<CardGroup cols={2}>
+  <Card title="Orchestrator" icon="shuffle" href="/agents/orchestrator">
+    Learn how the orchestrator routes tasks automatically and why it's the recommended default agent for most projects.
+  </Card>
+  <Card title="Specialist Agents" icon="wrench" href="/agents/specialists">
+    Dive into the domain-specific agents for web, C#, Rust, FiveM, Discord, Unity, Godot, and OpenCode config.
+  </Card>
+  <Card title="Research & Review" icon="magnifying-glass" href="/agents/research-review">
+    Explore the planner, developer, researcher, tester, and code-reviewer agents that keep your implementation quality high.
+  </Card>
+  <Card title="Skills" icon="bolt" href="/skills/overview">
+    Discover the skills that specialist agents load to extend their capabilities for design, animation, testing, and more.
+  </Card>
+</CardGroup>

@@ -1,0 +1,65 @@
+---
+title: "awesome-design-md: UI Design Reference for webdev"
+sidebarTitle: "Design"
+description: "The awesome-design-md skill loads curated DESIGN.md references into the webdev agent so your UI matches a brand's visual language and design system."
+---
+
+The `awesome-design-md` skill loads into the webdev agent when you want your UI to look and feel like a specific product, brand, or visual category. Rather than working from a vague description of "clean" or "modern," this skill gives the agent access to a curated collection of real-world DESIGN.md files — each one capturing a brand's color palette, typography, spacing, component patterns, and layout language. The result is UI that feels deliberately aligned with a recognizable design direction, not generically polished.
+
+## When It's Loaded
+
+The webdev agent loads `awesome-design-md` whenever you ask for a UI that references a specific brand, aesthetic, or design system. Common triggers include requests like:
+
+- "Make this feel like Stripe"
+- "Create a UI inspired by Linear or Raycast"
+- "Use a dark, code-editor-inspired aesthetic"
+- "Build a landing page with a premium fintech look"
+- "Find a visual direction based on an actual brand"
+
+The `apple-design` skill is a separate skill that the webdev agent loads independently — only when a task calls for Apple-style gesture-driven interaction, fluid spring motion, translucent materials, or reduced-motion behavior. The two skills can complement each other but serve different purposes: `awesome-design-md` is for brand and visual-language matching, while `apple-design` is for Apple-specific interaction and motion patterns.
+
+## What It Provides
+
+The skill draws on the [awesome-design-md](https://github.com/voltagent/awesome-design-md) collection — a curated repository of DESIGN.md files extracted from public websites across several product categories:
+
+<Accordion title="AI and developer tools">
+  References for AI platforms and developer tools: Claude, Cursor, Vercel, Warp, Raycast, and OpenCode-style product aesthetics. Typically dark, high-contrast, and information-dense.
+</Accordion>
+
+<Accordion title="SaaS and productivity">
+  Visual systems from products like Linear, Notion, Intercom, Mintlify, and Superhuman. Tend toward clean hierarchy, generous white space, and strong typographic scale.
+</Accordion>
+
+<Accordion title="Fintech and commerce">
+  References from Stripe, Coinbase, Revolut, and Wise. Common cues include premium white space, subtle color accents, high trust signals, and polished data tables.
+</Accordion>
+
+<Accordion title="Consumer and media brands">
+  References from Apple, Spotify, Uber, Tesla, Nintendo, and BMW. Range from warm minimalism with serif headings to bold editorial black-and-white.
+</Accordion>
+
+When you name a brand or category, the agent identifies the closest match in the collection, explains the key visual cues that make it a good fit, and provides a prompt you can use to guide your AI coding agent. The recommended workflow is to copy the selected DESIGN.md into your project root and use it as the visual source of truth for the agent.
+
+The skill also provides a ready-made prompt template you can give to any AI coding agent:
+
+```text
+Use the design system in the selected DESIGN.md as the visual source of truth.
+Match the mood, palette, type scale, spacing, and component language while
+keeping the product structure and UX for my app.
+```
+
+## Example
+
+The following prompt triggers the webdev agent to load `awesome-design-md` and apply a real-world design reference:
+
+```text
+Build a responsive dashboard with cards and a sidebar navigation using Tailwind,
+styled to feel like a premium developer tool — dark background, sharp type, and
+subtle green accents.
+```
+
+The agent will match your request to the closest brand reference in the collection, explain the visual cues, and generate UI that follows that design language rather than a generic template.
+
+<Tip>
+  The webdev agent loads `awesome-design-md` automatically when your prompt references a brand, aesthetic, or visual direction. If you also want Apple-style motion or interaction patterns — spring animations, gesture transitions, or reduced-motion support — mention that explicitly so the agent knows to load the `apple-design` skill as well.
+</Tip>
