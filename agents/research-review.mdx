@@ -1,7 +1,7 @@
 ---
-title: "Research, Testing, and Code Review Agents"
+title: "Planning, Research, Testing, and Code Review Agents"
 sidebarTitle: "Research & Review"
-description: "The planner, developer, researcher, tester, and code-reviewer agents ensure every feature is well-planned, grounded in accurate facts, and verified before it ships."
+description: "Planner, developer, researcher, tester, and code-reviewer agents keep every feature well-planned, fact-grounded, and verified before it ships."
 ---
 
 Quality implementation is more than writing code. This group of agents handles the stages that come before and after a specialist writes a single line: structured planning, external research, test coverage, and post-implementation review. Together they form the safety layer of the pack — catching problems early, grounding decisions in accurate information, and catching anything that slips through before it reaches production. The orchestrator calls several of these automatically, but you can invoke any of them directly when you need a focused pass.
@@ -128,8 +128,11 @@ The `code-reviewer` agent reviews completed implementation work and reports find
 - **Regressions** — changes that break existing behavior
 - **Error handling** — unhandled exceptions, silent failures, missing fallbacks
 - **Performance** — unnecessary allocations, N+1 queries, blocking calls
+- **Memory / resource issues** — leaks, unclosed handles, unbounded growth
 - **API misuse** — wrong method signatures, deprecated APIs, incorrect usage patterns
 - **Concurrency** — race conditions, deadlocks, unsafe shared state
+- **Breaking changes** — modifications that alter public APIs or existing contracts
+- **Framework conventions** — deviation from the project's established patterns
 - **Missing tests** — logic that has no coverage
 - **Unnecessary changes** — scope creep or unrelated modifications
 

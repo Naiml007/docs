@@ -1,15 +1,15 @@
 ---
-title: "unity-cli-helper: Unity Editor and CLI Automation"
+title: "unity-cli-helper: Unity CLI, Builds, and Diagnostics"
 sidebarTitle: "Unity CLI"
-description: "The unity-cli-helper skill gives the unity agent accurate commands for headless builds, module installs, license activation, CI patterns, and diagnostics."
+description: "The unity-cli-helper skill gives the unity agent exact commands for editor installs, module management, license activation, CI patterns, and diagnostics."
 ---
 
 The `unity-cli-helper` skill gives the unity agent precise, schema-accurate knowledge for every Unity command-line task. When you ask the unity agent to install an editor, manage modules, activate a license, set up a CI pipeline, or run diagnostics, it loads this skill before responding. The skill ensures the agent produces exact commands with the correct flags — not approximations — and warns you when a step could fail in a non-interactive or CI environment.
 
 ## What It Covers
 
-<Accordion title="Unity executable CLI flags for headless builds">
-  The skill documents the full set of flags for running Unity in batch mode: version aliases (`latest`, `lts`, `default`, or a stream like `6` or `2022`), changeset overrides with `-c`/`--changeset`, architecture selection on macOS with `-a`/`--architecture`, and child-module auto-installation with `--cm`/`--childModules`.
+<Accordion title="Editor installation flags and version selection">
+  The skill documents the full set of options for `unity install`: version aliases (`latest`, `lts`, `default`, or a stream like `6` or `2022`), changeset overrides with `-c`/`--changeset` for versions not in the standard release list, architecture selection on macOS with `-a`/`--architecture` (`arm64` or `x86_64`), and child-module auto-installation with `--cm`/`--childModules`.
 </Accordion>
 
 <Accordion title="Module management and installation">

@@ -1,5 +1,5 @@
 ---
-title: "Configure opencode.json for Your Project"
+title: "Configure Naimur OpenCode Agents with opencode.json"
 sidebarTitle: "Configuration"
 description: "A complete reference for every field in opencode.json — the workspace-level config file that controls agents, permissions, and MCP integrations."
 ---
@@ -109,9 +109,9 @@ Below is the complete `opencode.json` used by this pack, including the optional 
 
   ```json
   "mcp": {
-    "ziva-godot": {
-      "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe",
-      "args": ["--mcp-bridge", "--godot-bin", "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe", "--upstream", "http://localhost:7012/api/mcp"],
+    "my-server": {
+      "command": "/usr/local/bin/my-mcp-server",
+      "args": ["--flag", "value"],
       "enabled": true
     }
   }
@@ -126,7 +126,7 @@ Each entry under `mcp` supports the following fields:
   The absolute path to the MCP server executable. Use a full path to avoid issues with `PATH` resolution across different shells and operating systems.
 
   ```json
-  "command": "C:\\Users\\distr\\AppData\\Roaming\\ziva-local\\bin\\zivacode.exe"
+  "command": "/usr/local/bin/my-mcp-server"
   ```
 </ParamField>
 
@@ -137,9 +137,9 @@ Each entry under `mcp` supports the following fields:
   "args": [
     "--mcp-bridge",
     "--godot-bin",
-    "C:/gamedev-3d/Godot_v4/Godot_v4.7.2-stable_mono_win64.exe",
+    "/path/to/Godot_v4.exe",
     "--upstream",
-    "http://localhost:7012/api/mcp"
+    "http://localhost:PORT/api/mcp"
   ]
   ```
 </ParamField>
@@ -164,7 +164,7 @@ The `default_agent` field lets you optimize opencode for a specific workflow in 
 "default_agent": "orchestrator"
 ```
 
-**Use `"planner"`** when you are in an early design or discovery phase and want to think through an implementation without writing any code yet. The planner agent breaks features into step-by-step implementation plans but holds all edit and bash permissions — it will never modify your files.
+**Use `"planner"`** when you are in an early design or discovery phase and want to think through an implementation without writing any code yet. The planner agent breaks features into step-by-step implementation plans and denies all edit and bash permissions — it will never modify your files.
 
 ```json
 "default_agent": "planner"

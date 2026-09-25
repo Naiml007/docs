@@ -16,7 +16,7 @@ Each agent file opens with a frontmatter block between `---` delimiters. The fie
 |---|---|---|
 | `description` | ✅ | A short plain-English summary of what this agent handles. The orchestrator reads this to decide when to route a task here. Make it specific — vague descriptions lead to poor routing. |
 | `mode` | ✅ | Either `primary` or `subagent`. See [Primary vs Subagent Mode](#primary-vs-subagent-mode) below. |
-| `model` | ✅ | The opencode model ID to run this agent on, e.g. `opencode/big-pickle`. |
+| `model` | ❌ | The opencode model ID to run this agent on, e.g. `opencode/big-pickle`. Omit to inherit the workspace default model. |
 | `temperature` | ❌ | Sampling temperature as a decimal. Lower values (e.g. `0.2`) produce more deterministic, predictable output. Omit to use the model default. |
 | `permission` | ❌ | An object controlling what the agent can do. Accepts sub-keys `edit`, `bash`, and `skill`. |
 
@@ -119,7 +119,7 @@ The `mode` field has exactly two valid values, and they control how opencode exp
   </Card>
 </CardGroup>
 
-The orchestrator in this pack is set to `mode: primary` — it is the entry point you interact with. Every domain specialist (webdev, opencode, etc.) is `mode: subagent`, meaning the orchestrator picks them based on its routing rules rather than you selecting them manually.
+In this pack, `orchestrator`, `planner`, and `dev` are set to `mode: primary` — they appear in opencode's agent selector and can be invoked directly. Every domain specialist (`webdev`, `csharp`, `rust`, `godot`, `discord`, `unity`, `fivem`, `opencode`, `researcher`, `code-researcher`, `code-reviewer`, and `tester`) is `mode: subagent`, meaning the orchestrator picks them based on its routing rules rather than you selecting them manually.
 
 <Warning>
   Changing the routing rules inside `agents/orchestrator.md` affects how **all** tasks are delegated across every specialist. A poorly written routing rule can cause the orchestrator to use the wrong specialist or skip delegation entirely. After editing the `## SPECIALIST ROUTING` section, test several representative tasks to confirm routing behaves as expected before committing your changes.
